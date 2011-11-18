@@ -1,0 +1,4 @@
+#!/bin/bash
+rpmdev-bumpspec -c "为 Magic 3.0 重建" -u "Liu Di <liudidi@gmail.com>" $1
+rpmbuild -ba --clean $1
+./mvs $1

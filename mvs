@@ -1,0 +1,48 @@
+#!/bin/bash
+if [ -z "$1" ] ; then 
+	echo "Usage: $0 xxx.spec"
+	exit 1
+fi
+if ! [ -f $1 ]; then
+	echo "file no existed"
+	exit 1
+fi
+DIR=`echo $1|cut -d. -f1`
+echo $DIR
+if [[ $DIR =~ ^[a-eA-E] ]];then
+	echo "a-e"
+	SPECDIR=MagicSpecA-E
+fi
+if [[ $DIR =~ ^[f-kF-K] ]];then
+	SPECDIR=MagicSpecF-K
+fi
+if [[ $DIR =~ ^[l-pL-P] ]];then
+	if [[ $DIR =~ ^[lL][iI][bB] ]];then
+        SPECDIR=MagicSpecLib
+	else
+        SPECDIR=MagicSpecL-P
+	fi
+fi
+if [[ $DIR =~ ^[q-uQ-U] ]];then
+        SPECDIR=MagicSpecQ-U
+fi
+if [[ $DIR =~ ^[v-zV-Z] ]];then
+        SPECDIR=MagicSpecV-Z
+fi
+if [[ $DIR =~ ^[0-9] ]];then
+        SPECDIR=MagicSpec0-9
+fi
+echo $SPECDIR
+mkdir $SPECDIR/$DIR
+mv -iv $1 $SPECDIR/$DIR
+for i in `cat $SPECDIR/$DIR/$1 |grep ^Patch|grep -v http|grep -v ftp|cut -d: -f2`;do
+	mv -iv ../SOURCES/$i $SPECDIR/$DIR
+done 
+
+for i in `cat $SPECDIR/$DIR/$1 |grep ^Source|grep -v http|grep -v ftp|cut -d: -f2`;do
+        mv -iv ../SOURCES/$i $SPECDIR/$DIR
+done
+
+cd $SPECDIR/$DIR
+git add .
+git commit -m "添加 $DIR"
