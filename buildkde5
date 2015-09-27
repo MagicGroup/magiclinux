@@ -1,0 +1,24 @@
+#!/bin/bash
+KDELIST="kf5 extra-cmake-modules kf5-attica"
+if [ -z "$1" ] ; then
+        echo "请输入版本号"
+        exit 1
+fi
+VER=$1
+for i in $KDELIST;do 
+	if [ "$i" = "nepomuk-widgets" ]; then
+                j="nepomuk-widgets-libs"
+	else
+		j=$i
+        fi
+	if [ "$i" = "PyKDE4" ]; then
+		continue
+	fi
+	CUVER=$(rpm -q --qf "%{VERSION}\n" $j)
+	if [ x"$VER" = x"$CUVER" ];then
+		echo "本机已经安装 $VER 版本的 $i"
+	else
+		./rcf $i || exit 1
+	fi
+	./rcf PyKDE4
+done

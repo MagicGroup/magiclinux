@@ -1,0 +1,16 @@
+#!/bin/bash -x
+#ls -d MagicSPECS/SPECS.perl/perl-* |sort > perl.list
+#for i in `cat perl.list`;do 
+#	NAME=$(echo $i|sed -e 's!MagicSPECS/SPECS.perl/!!');
+#	./rcf $NAME
+#done
+ls  MagicSPECS/SPECS.perl/perl-*/*fail | sed -e 's![^/]*fail!!g' |sort | uniq > perlfail.list
+while ! cmp perl.list perlfail.list ; do
+   ls  MagicSPECS/SPECS.perl/perl-*/*fail | sed -e 's![^/]*fail!!g' |sort | uniq  > perlfail.list
+   for j in `cat perlfail.list`;do	
+	NAME=$(echo $j|sed -e 's!MagicSPECS/SPECS.perl/!!'|sed -e 's!/!!');
+        ./rcf $NAME
+   done
+   ls  MagicSPECS/SPECS.perl/perl-*/*fail | sed -e 's![^/]*fail!!g' |sort | uniq > perl.list
+done
+echo "剩余的编译失败的包请手工处理！"

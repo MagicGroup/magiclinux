@@ -1,0 +1,19 @@
+#!/bin/bash -x
+if ! [ -f alldone ]; then 
+ls -d MagicSPECS/SPECS.r/rubygem-* |sort > rubygem.list
+for i in `cat rubygem.list`;do 
+	NAME=$(echo $i|sed -e 's!MagicSPECS/SPECS.r/!!');
+	./rcf $NAME
+done
+fi
+touch alldone
+ls  MagicSPECS/SPECS.r/rubygem-*/*fail | sed -e 's![^/]*fail!!g' |sort | uniq > rubyfail.list
+while ! cmp ruby.list rubyfail.list ; do
+   ls  MagicSPECS/SPECS.r/rubygem-*/*fail | sed -e 's![^/]*fail!!g' |sort | uniq  > rubyfail.list
+   for j in `cat rubyfail.list`;do	
+	NAME=$(echo $j|sed -e 's!MagicSPECS/SPECS.r/!!'|sed -e 's!/!!');
+        ./rcf $NAME
+   done
+   ls  MagicSPECS/SPECS.r/rubygem-*/*fail | sed -e 's![^/]*fail!!g' |sort | uniq > ruby.list
+done
+echo "剩余的编译失败的包请手工处理！"

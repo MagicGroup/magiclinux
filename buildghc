@@ -1,0 +1,16 @@
+#!/bin/bash -x
+#ls -d MagicSPECS/SPECS.ghc/ghc-* |sort > ghc.list
+#for i in `cat ghc.list`;do 
+#	NAME=$(echo $i|sed -e 's!MagicSPECS/SPECS.ghc/!!');
+#	./rcf $NAME
+#done
+ls  MagicSPECS/SPECS.g/ghc-*/*fail | sed -e 's![^/]*fail!!g' |sort | uniq > ghcfail.list
+while ! cmp ghc.list ghcfail.list ; do
+   ls  MagicSPECS/SPECS.g/ghc-*/*fail | sed -e 's![^/]*fail!!g' |sort | uniq  > ghcfail.list
+   for j in `cat ghcfail.list`;do	
+	NAME=$(echo $j|sed -e 's!MagicSPECS/SPECS.g/!!'|sed -e 's!/!!');
+        ./rcf $NAME
+   done
+   ls  MagicSPECS/SPECS.g/ghc-*/*fail | sed -e 's![^/]*fail!!g' |sort | uniq > ghc.list
+done
+echo "剩余的编译失败的包请手工处理！"

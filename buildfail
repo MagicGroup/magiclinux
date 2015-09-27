@@ -1,0 +1,8 @@
+#!/bin/bash
+while [ 1 = 1 ]; do
+ls failspec/*.spec > faillist
+./buildf
+ls failspec/*.spec > faillist1
+diff -u faillist faillist1 && read -p pause pause
+done
+

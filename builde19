@@ -1,0 +1,7 @@
+#!/bin/bash
+E17LIST="efl enlightenment expedite evil evas_generic_loaders elementary "
+
+VER=$1
+for i in $E17LIST;do 
+		./rc $i || exit 1
+done

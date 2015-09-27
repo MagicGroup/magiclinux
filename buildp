@@ -1,0 +1,14 @@
+#!/bin/bash
+for i in `cat $1.srpmlist`;do
+ if [ -f ../SRPMS/$i  -o -f ../SRPMS/finish/$i ];then
+  rpm -ivh ../SRPMS/$i || rpm -ivh ../SRPMS/finish/$i
+ else
+  echo $i >> failsrpm
+  echo "$i 不存在"
+ fi
+ for j in `ls *.spec`;do
+  echo "编译 $j"
+  ./upperl $j 
+  #> $j.log 2>&1 && rm $j.log || mv $j* failspec
+ done
+done 

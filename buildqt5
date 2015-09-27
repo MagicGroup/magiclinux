@@ -1,0 +1,41 @@
+#!/bin/bash
+QT5LIST="qt5-qtbase
+qt5-qtconfiguration
+qt5-qtconnectivity
+qt5-qtdeclarative
+qt5-qtdoc
+qt5-qtgraphicaleffects
+qt5-qtimageformats
+qt5-qtlocation
+qt5-qtmultimedia
+qt5-qtquick1
+qt5-qtquickcontrols
+qt5-qtscript
+qt5-qtsensors
+qt5-qtserialport
+qt5-qtsvg
+qt5-qttools
+qt5-qttranslations
+qt5-qtwayland
+qt5-qtwebkit
+qt5-qtx11extras
+qt5-qtxmlpatterns"
+
+if [ -z "$1" ] ; then
+        echo "请输入版本号"
+        exit 1
+fi
+VER=$1
+for i in $KDELIST;do 
+	if [ "$i" = "nepomuk-widgets" ]; then
+                j="nepomuk-widgets-libs"
+	else
+		j=$i
+        fi
+	CUVER=$(rpm -q --qf "%{VERSION}\n" $j)
+	if [ x"$VER" = x"$CUVER" ];then
+		echo "本机已经安装 $VER 版本的 $i"
+	else
+		./rcf $i || exit 1
+	fi
+done

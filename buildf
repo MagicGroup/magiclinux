@@ -1,0 +1,8 @@
+#!/bin/bash
+for i in failspec/*.spec; do
+   mv $i .
+   for j in *.spec; do
+   echo $j
+     ./rcf $j > $j.log 2>&1 && rm $j.log || mv $j* failspec
+   done
+done

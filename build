@@ -1,0 +1,5 @@
+#!/bin/bash
+./rc $1 || exit 1
+./rs
+ssh -t magic@219.231.240.162 "cd rpmbuild/SPECS;./rc $1 > /dev/null 2>&1 &;exit" || exit 1
+#ssh -t magic@219.231.240.168 "cd rpmbuild/SPECS;./rc $1" || exit 1

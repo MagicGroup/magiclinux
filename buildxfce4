@@ -1,0 +1,7 @@
+#!/bin/bash
+E17LIST="xfconf libxfce4util libxfce4ui xfwm4 xfce4-panel xfdesktop"
+
+VER=$1
+for i in $E17LIST;do 
+		./rc $i || exit 1
+done

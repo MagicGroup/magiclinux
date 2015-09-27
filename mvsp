@@ -1,0 +1,59 @@
+#!/bin/bash
+if [ -z "$1" ] ; then 
+	echo "Usage: $0 xxx.spec"
+	exit 1
+fi
+if ! [ -f $1 ]; then
+	echo "file no existed"
+	exit 1
+fi
+DIR=`echo $1|cut -d. -f1`
+echo $DIR
+for i in {0..9} {a..z} {A..Z};do
+        if [[ $DIR =~ ^[l] ]];then
+                if [[ $DIR =~ ^[l][i][b] ]]; then
+                        SPECDIR=MagicSPECS/SPECS.lib
+			break
+                else
+                        SPECDIR=MagicSPECS/SPECS.l
+			break
+                fi
+        elif [[ $DIR =~ ^[t] ]];then
+                if [[ $DIR =~ ^[t][e][x][l][i][v][e] ]]; then
+                        SPECDIR=MagicSPECS/SPECS.texlive
+			break
+                elif [[ $DIR =~ ^[t][r][i][n][i][t][y] ]]; then
+                        SPECDIR=MagicSPECS/SPECS.trinity
+			break
+                else
+                        SPECDIR=MagicSPECS/SPECS.t
+			break
+                fi
+        elif [[ $DIR =~ ^["$i"] ]]; then
+                SPECDIR=MagicSPECS/SPECS.$i
+		break
+		echo "出现错误。"
+        fi
+done
+echo $SPECDIR
+mkdir -p $SPECDIR/$DIR
+if [ $? -ne 0 ]; then
+	U="更新"
+else
+	U="添加"
+	cp autopack.sh $SPECDIR/$DIR
+fi
+mv -fv $1 $SPECDIR/$DIR
+for i in `spectool -l $SPECDIR/$DIR/$1 |grep ^Patch|grep -v http|grep -v ftp|grep -v bz2|grep -v xz|grep -v gz|grep -v zip|cut -d: -f2`;do
+	mv -fv ../SOURCES/$i $SPECDIR/$DIR
+done 
+
+for i in `spectool -l $SPECDIR/$DIR/$1 |grep ^Source|grep -v http|grep -v ftp|grep -v bz2|grep -v xz|grep -v gz|grep -v zip|cut -d: -f2`;do
+        mv -fv ../SOURCES/$i $SPECDIR/$DIR
+done
+
+cd $SPECDIR/$DIR
+git add .
+git commit -m "$U $DIR"
+cd -
+exit 0
