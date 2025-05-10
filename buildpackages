@@ -1,0 +1,71 @@
+#!/bin/bash
+
+# 定义文件名
+FILE="$1"
+
+# 定义编译和安装命令
+COMPILE_CMD="rb"
+INSTALL_CMD="dis"
+
+# 检查文件是否存在
+if [[ ! -f "$FILE" ]]; then
+    echo "文件 $FILE 不存在。"
+    exit 1
+fi
+while true; do
+	if [ -f $1.fail ]; then
+		current_count=$(cat $1.fail | wc -l)
+		 # 比较当前计数和之前的计数
+		if [[ $current_count -eq $previous_count ]]; then
+		      echo "文件数量不再变化: $current_count 个 $1 文件."
+		      break
+		fi
+	else
+		current_count=0
+	fi
+	# 更新文件计数
+	previous_count=$current_count
+	rm $1.fail -fv
+# 逐行读取文件
+while IFS= read -r package; do
+    # 假设版本号为 5.15.2，可以根据需要修改
+    VERSION=$2
+    FULL_PACKAGE="${package}-${VERSION}-*.src.rpm"
+
+    echo "正在处理包: $package"
+
+    # 执行编译程序
+    echo "编译 $package ..."
+    if [ -f $package.spec ]; then
+    ./rb $package.spec
+    if [ -f $package.spec ]; then
+	    echo "$package 编译失败"
+	    echo "继续编译下一包"
+	    echo $package >> $1.fail
+    else
+	    echo "$package 编译成功"
+	    echo $package >> $1.suc
+	    echo "安装 $package"
+	       pushd ../RPMS/x86_64
+	       	   mv ../noarch/*.rpm . -fv
+		   ./rd
+		   rpm -Uvh *.rpm
+		   RPMRETURN=$?
+		   echo $RPMRETURN
+	           if [ $RPMRETURN -eq 0 ]; then
+			   echo "安装 $package 成功，编译下一个包"
+			   ./mvr
+		   elif [ $RPMRETURN -eq 1 ]; then
+			   echo "安装 $package 失败，退出"
+			   break 2
+		   else
+			   echo "已安装 $package ，编译下一包。"
+			   ./mvr
+	           fi
+	        popd
+     fi
+     fi
+done < "$FILE"
+done
+
+echo "所有包均已成功编译和安装。"

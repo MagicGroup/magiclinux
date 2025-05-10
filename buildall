@@ -1,13 +1,29 @@
 #!/bin/bash
-for i in `cat srpmfulllist`;do
- if [ -f ../SRPMS/$i  -o -f ../SRPMS/finish/$i ];then
-  rpm -ivh ../SRPMS/$i || rpm -ivh ../SRPMS/finish/$i
- else
-  echo $i >> failsrpm
-  echo "$i 不存在"
- fi
- for j in `ls *.spec`;do
-  echo "编译 $j"
-  ./upre $j > $j.log 2>&1 && rm $j.log || mv $j* failspec
- done
-done 
+
+# 初始文件计数
+previous_count=0
+
+while true; do
+    # 当前的文件计数
+    current_count=$(ls $1 2>/dev/null | wc -l)
+
+    # 比较当前计数和之前的计数
+    if [[ $current_count -eq $previous_count ]]; then
+        echo "文件数量不再变化: $current_count 个 $1 文件."
+        break
+    fi
+
+    # 更新文件计数
+    previous_count=$current_count
+
+    # 执行 rb 命令
+    echo "执行 'rb'，当前文件数量: $current_count"
+    mv *.log logs -fv
+    for i in $1;do ./rb $i;done
+    pushd ../RPMS/x86_64
+    ./ruf
+    popd
+
+    # 添加短暂的休眠以避免过于频繁地执行循环
+    sleep 1
+done

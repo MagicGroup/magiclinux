@@ -1,0 +1,2 @@
+#!/bin/bash
+dnf builddep $1 -y

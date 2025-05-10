@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "使用方式：$0 xxx.spec"
+rpmbuild --rebuild --nocheck --rmspec --rmsource --without tests --without testsuite --with ghc_prof $1  2>&1 | tee $(basename "$1").log
